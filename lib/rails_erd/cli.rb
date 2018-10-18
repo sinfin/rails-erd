@@ -173,7 +173,15 @@ module RailsERD
       end
       if defined? Rails
         Rails.application.eager_load!
-        Rails.application.config.eager_load_namespaces.each(&:eager_load!) if Rails.application.config.respond_to?(:eager_load_namespaces)
+        if Rails.application.config.respond_to?(:eager_load_namespaces)
+          Rails.application.config.eager_load_namespaces.each do |namespace|
+            begin
+              namespace.eager_load!
+            rescue RuntimeError
+              puts "Namespace #{namespace} already loaded"
+            end
+          end
+        end
       end
     rescue TypeError
     end
